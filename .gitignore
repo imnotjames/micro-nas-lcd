@@ -16,3 +16,5 @@ go.work
 
 # Binary from `go build .`
 micro-nas-lcd
+linux-arm64
+linux-amd64
