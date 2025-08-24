@@ -22,4 +22,6 @@ jobs:
           GOARCH: arm64
         run: go build -o linux-arm64 .
       - name: Attach artifact to release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: gh release upload ${{github.event.release.tag_name}} linux-arm64
