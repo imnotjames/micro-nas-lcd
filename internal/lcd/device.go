@@ -25,6 +25,7 @@ const (
 )
 
 type AdafruitLCDDevice struct {
+	mcp          *mcp23xxx.Dev
 	bus          i2c.BusCloser
 	dev          *hd44780.Dev
 	backlightPin gpio.PinOut
@@ -33,7 +34,7 @@ type AdafruitLCDDevice struct {
 	format       string
 }
 
-func NewAdafruitI2CBackpack(bus i2c.Bus, address uint16, columns uint8, rows uint8) (*AdafruitLCDDevice, error) {
+func NewAdafruitI2CBackpack(bus i2c.BusCloser, address uint16, columns uint8, rows uint8) (*AdafruitLCDDevice, error) {
 	mcp, err := mcp23xxx.NewI2C(bus, mcp23xxx.MCP23008, address)
 	if err != nil {
 		return nil, err
@@ -54,6 +55,8 @@ func NewAdafruitI2CBackpack(bus i2c.Bus, address uint16, columns uint8, rows uin
 	dev, err := hd44780.New(dataPins, reset, enable)
 
 	return &AdafruitLCDDevice{
+		mcp:          mcp,
+		bus:          bus,
 		backlightPin: bl,
 		dev:          dev,
 		columns:      columns,
@@ -81,11 +84,19 @@ func NewDevice(address uint16, columns uint8, rows uint8) (*AdafruitLCDDevice, e
 }
 
 func (d *AdafruitLCDDevice) Close() error {
-	return d.bus.Close()
+	if err := d.mcp.Close(); err != nil {
+		return err
+	}
+
+	if err := d.bus.Close(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (d *AdafruitLCDDevice) MustClose() {
-	err := d.bus.Close()
+	err := d.Close()
 	if err != nil {
 		panic(err)
 	}
