@@ -57,7 +57,7 @@ func NewAdafruitI2CBackpack(bus i2c.Bus, address uint16, columns uint8, rows uin
 		dev:          dev,
 		columns:      columns,
 		rows:         rows,
-		format:       fmt.Sprintf("%%%ds\n", columns),
+		format:       fmt.Sprintf("%%%ds", columns),
 	}, nil
 }
 
