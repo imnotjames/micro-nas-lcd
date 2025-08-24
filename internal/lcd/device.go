@@ -102,7 +102,7 @@ func (d *AdafruitLCDDevice) Backlight(intensity display.Intensity) (err error) {
 func (d *AdafruitLCDDevice) UpdateText(lines ...string) error {
 	log.Println("Updating text...")
 	if len(lines) > int(d.rows) {
-		return fmt.Errorf("too many lines")
+		lines = lines[:d.rows]
 	}
 
 	log.Println("Enabling backlight...")
