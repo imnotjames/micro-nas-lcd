@@ -30,8 +30,24 @@ func mustUpdateText(dev *lcd.AdafruitLCDDevice, text ...string) {
 
 var displayCmd = &cobra.Command{
 	Use:   "display",
-	Short: "",
-	Long:  "",
+	Short: "Cycles the LCD through helpful information.",
+	Long: `
+This will cycle through a variety of helpful pieces of information
+about the NAS.
+
+This includes:
+
+* Hostname
+* Uptime
+* Memory Utilization
+* Swap Utilization
+* CPU Utilization
+* System Load
+* Transmitted Bytes
+* Received Bytes
+* Network Status
+* Current IP
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		dev, err := lcd.NewDevice(0x20, 16, 2)
 		if err != nil {
