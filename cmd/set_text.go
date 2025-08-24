@@ -7,8 +7,19 @@ import (
 
 var setTextCmd = &cobra.Command{
 	Use:   "set-text",
-	Short: "",
-	Long:  "",
+	Short: "Set the LCD Display Text",
+	Long: `
+This updates the text displayed on the micronas LCD
+panel.  Each "argument" passed is a line for the text.
+
+For example,
+
+	micro-nas-lcd set-text "Hello World" "Be Happy"
+
+will display two lines of text on the LCD panel.
+
+If the text is longer than the LCD panel it will be truncated.
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		dev, err := lcd.NewDevice(0x20, 16, 2)
 		if err != nil {
