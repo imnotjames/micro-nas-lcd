@@ -3,6 +3,7 @@ package lcd
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"periph.io/x/conn/v3/display"
 	"periph.io/x/conn/v3/gpio"
@@ -115,6 +116,8 @@ func (d *AdafruitLCDDevice) UpdateText(lines ...string) error {
 		if err := d.dev.SetCursor(uint8(i), 0); err != nil {
 			return err
 		}
+
+		line = strings.Trim(line, " \t")
 
 		if len(line) > int(d.columns) {
 			line = fmt.Sprintf(d.format, line[:d.columns])
