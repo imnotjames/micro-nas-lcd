@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/shirou/gopsutil/v4/cpu"
+	"github.com/shirou/gopsutil/v4/disk"
 	"github.com/shirou/gopsutil/v4/host"
 	"github.com/shirou/gopsutil/v4/load"
 	"github.com/shirou/gopsutil/v4/mem"
@@ -183,4 +184,80 @@ func GetLocalIP(interfaceNames ...string) (string, error) {
 	}
 
 	return "", fmt.Errorf("no interface found")
+}
+
+func getDeviceUsage(device string) (*disk.UsageStat, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	partitions, err := disk.PartitionsWithContext(ctx, false)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, partition := range partitions {
+		if partition.Device != device {
+			continue
+		}
+
+		usage, err := disk.UsageWithContext(ctx, partition.Mountpoint)
+		if err != nil {
+			return nil, err
+		}
+
+		return usage, nil
+	}
+
+	return nil, fmt.Errorf("no matching device")
+}
+
+func GetDisks() ([]string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	partitions, err := disk.PartitionsWithContext(ctx, false)
+	if err != nil {
+		return nil, err
+	}
+
+	disks := make([]string, len(partitions))
+
+	for i, partition := range partitions {
+		disks[i] = partition.Device
+	}
+
+	slices.Sort(disks)
+	return slices.Compact(disks), nil
+}
+
+func GetDiskInfo(device string) (string, error) {
+	usage, err := getDeviceUsage(device)
+
+	shortDeviceName := strings.TrimPrefix(device, "/dev/")
+
+	if err != nil {
+		return fmt.Sprintf("no disk: %s", shortDeviceName), err
+	}
+
+	fsType := usage.Fstype
+
+	if fsType == "ext2/ext3" || fsType == "ext2" {
+		fsType = "ext"
+	}
+
+	return fmt.Sprintf("%s %s", shortDeviceName, fsType), nil
+}
+
+func GetDiskUtilization(device string) (string, error) {
+	usage, err := getDeviceUsage(device)
+	if err != nil {
+		return "", err
+	}
+
+	total := fmtBytes(usage.Total)
+
+	return fmt.Sprintf("%s %.2f%%",
+		total,
+		usage.UsedPercent,
+	), nil
 }

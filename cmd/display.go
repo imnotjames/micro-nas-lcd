@@ -68,11 +68,20 @@ This includes:
 			panic(err)
 		}
 
+		diskDeviceNames, err := cmd.Flags().GetStringArray("disks")
+
 		dev, err := lcd.NewDevice(address, columns, rows)
 		if err != nil {
 			panic(err)
 		}
 		defer dev.MustClose()
+
+		if len(diskDeviceNames) == 0 {
+			diskDeviceNames, err = stats.GetDisks()
+			if err != nil {
+				panic(err)
+			}
+		}
 
 		for {
 			hostText, _ := stats.GetHost()
@@ -116,6 +125,15 @@ This includes:
 			mustUpdateText(dev, connectionText, localIPText)
 
 			time.Sleep(interval)
+
+			for _, deviceName := range diskDeviceNames {
+				diskInfoText, _ := stats.GetDiskInfo(deviceName)
+				diskUtilizationText, _ := stats.GetDiskUtilization(deviceName)
+
+				mustUpdateText(dev, diskInfoText, diskUtilizationText)
+
+				time.Sleep(interval)
+			}
 		}
 	},
 }
@@ -124,4 +142,5 @@ func init() {
 	rootCmd.AddCommand(displayCmd)
 
 	displayCmd.Flags().DurationP("interval", "i", 3*time.Second, "Interval between pages")
+	displayCmd.Flags().StringArrayP("disks", "d", []string{}, "Disks to show")
 }
