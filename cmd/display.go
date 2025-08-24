@@ -11,7 +11,6 @@ import (
 )
 
 const MaxLineLength = 16
-const ScreenDuration = 3 * time.Second
 
 func fmtKeyVal(key string, text string) string {
 	if len(text) > MaxLineLength-4 {
@@ -64,6 +63,11 @@ This includes:
 			panic(err)
 		}
 
+		interval, err := cmd.Flags().GetDuration("interval")
+		if err != nil {
+			panic(err)
+		}
+
 		dev, err := lcd.NewDevice(address, columns, rows)
 		if err != nil {
 			panic(err)
@@ -79,7 +83,7 @@ This includes:
 				fmtKeyVal("UPT", uptimeText),
 			)
 
-			time.Sleep(ScreenDuration)
+			time.Sleep(interval)
 
 			memText, _ := stats.GetMemoryUtilization()
 			swapText, _ := stats.GetSwapUtilization()
@@ -89,13 +93,13 @@ This includes:
 				fmtKeyVal("SWP", swapText),
 			)
 
-			time.Sleep(ScreenDuration)
+			time.Sleep(interval)
 
 			cpuText, _ := stats.GetCpuUtilization()
 			loadText, _ := stats.GetLoad()
 			mustUpdateText(dev, fmtKeyVal("CPU", cpuText), loadText)
 
-			time.Sleep(ScreenDuration)
+			time.Sleep(interval)
 
 			totalTransmit, _ := stats.GetTotalTransmit()
 			totalReceive, _ := stats.GetTotalReceive()
@@ -105,17 +109,19 @@ This includes:
 				fmtKeyVal("TRX", totalReceive),
 			)
 
-			time.Sleep(ScreenDuration)
+			time.Sleep(interval)
 
 			connectionText, _ := stats.GetConnectionStatus("wlan0", "eth0")
 			localIPText, _ := stats.GetLocalIP("wlan0", "eth0")
 			mustUpdateText(dev, connectionText, localIPText)
 
-			time.Sleep(ScreenDuration)
+			time.Sleep(interval)
 		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(displayCmd)
+
+	displayCmd.Flags().DurationP("interval", "i", 3*time.Second, "Interval between pages")
 }
