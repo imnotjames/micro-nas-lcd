@@ -18,3 +18,9 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	cobra.CheckErr(rootCmd.Execute())
 }
+
+func init() {
+	rootCmd.PersistentFlags().Uint16P("address", "a", 0x20, "I2C Address of the Adafruit LCD Backpack")
+	rootCmd.PersistentFlags().Uint8P("columns", "c", 16, "Columns available on the LCD Panel")
+	rootCmd.PersistentFlags().Uint8P("rows", "r", 2, "Rows available on the LCD Panel")
+}

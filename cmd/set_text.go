@@ -21,7 +21,22 @@ will display two lines of text on the LCD panel.
 If the text is longer than the LCD panel it will be truncated.
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		dev, err := lcd.NewDevice(0x20, 16, 2)
+		address, err := cmd.Flags().GetUint16("address")
+		if err != nil {
+			panic(err)
+		}
+
+		columns, err := cmd.Flags().GetUint8("columns")
+		if err != nil {
+			panic(err)
+		}
+
+		rows, err := cmd.Flags().GetUint8("rows")
+		if err != nil {
+			panic(err)
+		}
+
+		dev, err := lcd.NewDevice(address, columns, rows)
 		if err != nil {
 			panic(err)
 		}
