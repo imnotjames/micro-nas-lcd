@@ -53,10 +53,9 @@ func fmtBytesTo(b uint64, precision uint8, level byte) string {
 
 func fmtMemoryUtilization(used uint64, total uint64, usedPercent float64) string {
 	return fmt.Sprintf(
-		"%3s/%3s %3.0f%%",
+		"%3s/%3s",
 		fmtBytesTo(used, 1, 'G'),
 		fmtBytesTo(total, 1, 'G'),
-		usedPercent,
 	)
 }
 
