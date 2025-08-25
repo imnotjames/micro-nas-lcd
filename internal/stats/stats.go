@@ -194,12 +194,14 @@ func GetLocalIP(interfaceNames ...string) (string, error) {
 		return "", fmt.Errorf("no interface found")
 	}
 
-	iface := interfaces[0]
-	if slices.Contains(iface.Flags, "up") {
-		return fmt.Sprintf("%s CONNECTED", iface.Name), nil
-	} else {
-		return fmt.Sprintf("%s DISCONNECTED", iface.Name), nil
+	for _, iface := range interfaces {
+		if len(iface.Addrs) > 0 {
+			addr, _, _ := strings.Cut(iface.Addrs[0].Addr, "/")
+			return addr, nil
+		}
 	}
+
+	return "", nil
 }
 
 func getDeviceUsage(device string) (*disk.UsageStat, error) {
