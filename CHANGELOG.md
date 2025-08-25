@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.2.0](https://github.com/imnotjames/micro-nas-lcd/compare/v0.1.0...v0.2.0) (2025-08-25)
+
+
+### Features
+
+* allow specifying duration between "pages" ([67ec6f4](https://github.com/imnotjames/micro-nas-lcd/commit/67ec6f47767552bd94965c1ec8e39533d4dcef10))
+* show disk information ([51e5701](https://github.com/imnotjames/micro-nas-lcd/commit/51e570199539a544a6dfa59787b3d302e4612406))
+
+
+### Bug Fixes
+
+* use columns for the key/val length ([69e4d13](https://github.com/imnotjames/micro-nas-lcd/commit/69e4d13b8cb4400b1a00526c263538b4697aad66))
+
 ## [0.1.0](https://github.com/imnotjames/micro-nas-lcd/compare/v0.0.1...v0.1.0) (2025-08-24)
 
 
