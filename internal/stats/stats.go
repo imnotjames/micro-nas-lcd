@@ -29,22 +29,26 @@ func fmtBytes(b uint64) string {
 }
 
 func fmtBytesPrecision(b uint64, precision uint8, threshold float64) string {
-	format := fmt.Sprintf("%%.%df%%c", precision)
-
-	unit, exp := float64(1), 0
-	for exp < len(UnitLetters) && b >= uint64(unit*1000*threshold) {
+	nextUnitBytes, exp := float64(1000), 0
+	for exp < len(UnitLetters) && b >= uint64(nextUnitBytes*threshold) {
 		exp++
-		unit = math.Pow(1000, float64(exp))
+		nextUnitBytes = math.Pow(1000, float64(exp+1))
 	}
 
-	return fmt.Sprintf(format, float64(b)/unit, UnitLetters[exp])
+	return fmtBytesTo(b, precision, UnitLetters[exp])
 }
 
 func fmtBytesTo(b uint64, precision uint8, level byte) string {
 	format := fmt.Sprintf("%%.%df%%c", precision)
+
 	exp := strings.IndexByte(UnitLetters, level)
-	div := math.Pow(1000, float64(exp))
-	return fmt.Sprintf(format, float64(b)/float64(div), UnitLetters[exp])
+	if exp < 0 {
+		exp = 0
+	}
+
+	unitBytes := math.Pow(1000, float64(exp))
+
+	return fmt.Sprintf(format, float64(b)/unitBytes, UnitLetters[exp])
 }
 
 func fmtMemoryUtilization(used uint64, total uint64, usedPercent float64) string {
