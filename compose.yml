@@ -3,3 +3,4 @@ services:
   micro-nas-lcd:
     image: "ghcr.io/imnotjames/micro-nas-lcd:0.3.1"
     privileged: true
+    netwok_mode: host
