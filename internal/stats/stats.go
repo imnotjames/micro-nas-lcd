@@ -22,6 +22,8 @@ const DiskUsageTimeout = 5 * time.Second
 const CpuUtilizationTimeout = 5 * time.Second
 const NetInterfacesTimeout = 5 * time.Second
 
+const UnitLetters = "BKMGTPE"
+
 func fmtBytes(b uint64) string {
 	return fmtBytesPrecision(b, 0, 1.0)
 }
@@ -29,24 +31,27 @@ func fmtBytes(b uint64) string {
 func fmtBytesPrecision(b uint64, precision uint8, threshold float64) string {
 	format := fmt.Sprintf("%%.%df%%c", precision)
 
-	const unit = 1000
-	unitThreshold := uint64(unit * threshold)
-	if b < unit {
-		return fmt.Sprintf(format, float64(b), 'B')
-	}
-	div, exp := uint64(unit), 0
-	for n := b / unit; n >= unitThreshold && exp < 6; n /= unit {
-		div *= unit
+	unit, exp := float64(1), 0
+	for exp < len(UnitLetters) && b >= uint64(unit*1000*threshold) {
 		exp++
+		unit = math.Pow(1000, float64(exp))
 	}
-	return fmt.Sprintf(format, float64(b)/float64(div), "KMGTPE"[exp])
+
+	return fmt.Sprintf(format, float64(b)/unit, UnitLetters[exp])
+}
+
+func fmtBytesTo(b uint64, precision uint8, level byte) string {
+	format := fmt.Sprintf("%%.%df%%c", precision)
+	exp := strings.IndexByte(UnitLetters, level)
+	div := math.Pow(1000, float64(exp))
+	return fmt.Sprintf(format, float64(b)/float64(div), UnitLetters[exp])
 }
 
 func fmtMemoryUtilization(used uint64, total uint64, usedPercent float64) string {
 	return fmt.Sprintf(
 		"%3s/%3s %3.0f%%",
-		fmtBytes(used),
-		fmtBytes(total),
+		fmtBytesTo(used, 1, 'G'),
+		fmtBytesTo(total, 1, 'G'),
 		usedPercent,
 	)
 }
