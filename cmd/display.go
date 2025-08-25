@@ -44,6 +44,8 @@ This includes:
 * Received Bytes
 * Network Status
 * Current IP
+* Disk Information
+* Disk Utilization
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		address, err := cmd.Flags().GetUint16("address")
