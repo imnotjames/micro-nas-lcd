@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0](https://github.com/imnotjames/micro-nas-lcd/compare/v0.2.1...v0.3.0) (2025-08-25)
+
+
+### Features
+
+* format memory as gigabytes only ([87930ba](https://github.com/imnotjames/micro-nas-lcd/commit/87930ba7c9dfd42492c033262619bcfa6b0f0382))
+
+
+### Bug Fixes
+
+* properly pull local IP ([c8849d5](https://github.com/imnotjames/micro-nas-lcd/commit/c8849d5a3e7fea2134539d70ca3fb9436d8eb752))
+
 ## [0.2.0](https://github.com/imnotjames/micro-nas-lcd/compare/v0.1.0...v0.2.0) (2025-08-25)
 
 
