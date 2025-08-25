@@ -10,12 +10,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func fmtKeyVal(key string, text string, maxLineLength uint8) string {
-	if len(text) > int(maxLineLength)-4 {
-		return fmt.Sprintf("%3s %12s", strings.ToUpper(key), text[:maxLineLength-4])
-	} else {
-		return fmt.Sprintf("%3s %12s", strings.ToUpper(key), text)
+func fmtKeyVal(key string, text string, lineLength uint8) string {
+	format := fmt.Sprintf("%%3s %%%ds", int(lineLength)-4)
+
+	text = strings.Trim(text, " \r\n\t")
+
+	if len(text) > int(lineLength)-4 {
+		text = text[:(lineLength - 4)]
+		text = strings.Trim(text, " \r\n\t")
 	}
+
+	return fmt.Sprintf(format, strings.ToUpper(key), text)
 }
 
 func mustUpdateText(dev *lcd.AdafruitLCDDevice, text ...string) {
