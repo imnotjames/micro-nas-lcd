@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.2](https://github.com/imnotjames/micro-nas-lcd/compare/v0.3.1...v0.3.2) (2025-08-25)
+
+
+### Bug Fixes
+
+* drop memory percent that doesn't show anyway ([234390b](https://github.com/imnotjames/micro-nas-lcd/commit/234390b53e8260cd7935c5039b9a6b8ab8fb069d))
+* handle spaces in columns more gracefully ([0a5b1da](https://github.com/imnotjames/micro-nas-lcd/commit/0a5b1da0f9f6816783ea000709d7b3f07918095f))
+
 ## [0.3.1](https://github.com/imnotjames/micro-nas-lcd/compare/v0.3.0...v0.3.1) (2025-08-25)
 
 
