@@ -16,6 +16,8 @@ COPY "./cmd/" "./cmd/"
 COPY internal/ ./internal/
 COPY main.go ./
 
+ENV CGO_ENABLED=0
+
 RUN go build .
 
 FROM scratch AS runner
