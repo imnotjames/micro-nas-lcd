@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/imnotjames/micro-nas-lcd/compare/v0.3.0...v0.3.1) (2025-08-25)
+
+
+### Bug Fixes
+
+* build with CGO_ENABLED off ([91d6867](https://github.com/imnotjames/micro-nas-lcd/commit/91d68672ba060145a55bbcc8df5190df9ace4391))
+
 ## [0.3.0](https://github.com/imnotjames/micro-nas-lcd/compare/v0.2.1...v0.3.0) (2025-08-25)
 
 
