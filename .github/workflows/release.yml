@@ -27,6 +27,11 @@ jobs:
         run: gh release upload ${{github.event.release.tag_name}} linux-arm64
   docker:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - name: Docker meta
