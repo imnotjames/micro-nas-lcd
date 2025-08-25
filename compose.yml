@@ -1,6 +1,6 @@
 version: "3.6"
 services:
   micro-nas-lcd:
-    image: "ghcr.io/imnotjames/micro-nas-lcd:0.3.1"
+    image: "ghcr.io/imnotjames/micro-nas-lcd:latest"
     privileged: true
     netwok_mode: host
