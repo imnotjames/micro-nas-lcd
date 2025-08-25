@@ -17,6 +17,11 @@ import (
 	"github.com/shirou/gopsutil/v4/sensors"
 )
 
+const ListDisksTimeout = 5 * time.Second
+const DiskUsageTimeout = 5 * time.Second
+const CpuUtilizationTimeout = 5 * time.Second
+const NetInterfacesTimeout = 5 * time.Second
+
 func fmtBytes(b uint64) string {
 	return fmtBytesPrecision(b, 0, 1.0)
 }
@@ -90,7 +95,7 @@ func GetCpuUtilization() (string, error) {
 		maxPercent = math.Max(maxPercent, percent)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), CpuUtilizationTimeout)
 	defer cancel()
 
 	temperatures, err := sensors.TemperaturesWithContext(ctx)
@@ -141,53 +146,64 @@ func GetTotalReceive() (string, error) {
 	return fmt.Sprintf("%4s", fmtBytesPrecision(total, 2, 9)), nil
 }
 
-func GetConnectionStatus(interfaceNames ...string) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+func getInterfaces(interfaceNames ...string) ([]net.InterfaceStat, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), NetInterfacesTimeout)
 	defer cancel()
 
 	interfaces, err := net.InterfacesWithContext(ctx)
 	if err != nil {
-		print(err)
+		return nil, err
+	}
+
+	return slices.Collect(func(yield func(net.InterfaceStat) bool) {
+		for _, iface := range interfaces {
+			if slices.Contains(interfaceNames, iface.Name) {
+				if !yield(iface) {
+					return
+				}
+			}
+		}
+	}), nil
+}
+
+func GetConnectionStatus(interfaceNames ...string) (string, error) {
+	interfaces, err := getInterfaces(interfaceNames...)
+	if err != nil {
 		return "", err
 	}
 
-	for _, iface := range interfaces {
-		if slices.Contains(interfaceNames, iface.Name) {
-			if slices.Contains(iface.Flags, "up") {
-				return fmt.Sprintf("%s CONNECTED", iface.Name), nil
-			} else {
-				return fmt.Sprintf("%s DISCONNECTED", iface.Name), nil
-			}
-		}
+	if len(interfaces) == 0 {
+		return "", fmt.Errorf("no interface found")
 	}
 
-	return "", fmt.Errorf("no interface found")
+	iface := interfaces[0]
+	if slices.Contains(iface.Flags, "up") {
+		return fmt.Sprintf("%s CONNECTED", iface.Name), nil
+	} else {
+		return fmt.Sprintf("%s DISCONNECTED", iface.Name), nil
+	}
 }
 
 func GetLocalIP(interfaceNames ...string) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	interfaces, err := net.InterfacesWithContext(ctx)
+	interfaces, err := getInterfaces(interfaceNames...)
 	if err != nil {
 		return "", err
 	}
 
-	for _, iface := range interfaces {
-		if slices.Contains(interfaceNames, iface.Name) {
-			if len(iface.Addrs) > 0 {
-				addr, _, _ := strings.Cut(iface.Addrs[0].Addr, "/")
-				return addr, nil
-			}
-		}
-
+	if len(interfaces) == 0 {
+		return "", fmt.Errorf("no interface found")
 	}
 
-	return "", fmt.Errorf("no interface found")
+	iface := interfaces[0]
+	if slices.Contains(iface.Flags, "up") {
+		return fmt.Sprintf("%s CONNECTED", iface.Name), nil
+	} else {
+		return fmt.Sprintf("%s DISCONNECTED", iface.Name), nil
+	}
 }
 
 func getDeviceUsage(device string) (*disk.UsageStat, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), DiskUsageTimeout)
 	defer cancel()
 
 	partitions, err := disk.PartitionsWithContext(ctx, false)
@@ -212,7 +228,7 @@ func getDeviceUsage(device string) (*disk.UsageStat, error) {
 }
 
 func GetDisks() ([]string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), ListDisksTimeout)
 	defer cancel()
 
 	partitions, err := disk.PartitionsWithContext(ctx, false)
