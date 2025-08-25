@@ -10,11 +10,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const MaxLineLength = 16
-
-func fmtKeyVal(key string, text string) string {
-	if len(text) > MaxLineLength-4 {
-		return fmt.Sprintf("%3s %12s", strings.ToUpper(key), text[:MaxLineLength-4])
+func fmtKeyVal(key string, text string, maxLineLength uint8) string {
+	if len(text) > int(maxLineLength)-4 {
+		return fmt.Sprintf("%3s %12s", strings.ToUpper(key), text[:maxLineLength-4])
 	} else {
 		return fmt.Sprintf("%3s %12s", strings.ToUpper(key), text)
 	}
@@ -88,8 +86,8 @@ This includes:
 			uptimeText, _ := stats.GetUptime()
 			mustUpdateText(
 				dev,
-				fmtKeyVal("HST", hostText),
-				fmtKeyVal("UPT", uptimeText),
+				fmtKeyVal("HST", hostText, columns),
+				fmtKeyVal("UPT", uptimeText, columns),
 			)
 
 			time.Sleep(interval)
@@ -98,40 +96,47 @@ This includes:
 			swapText, _ := stats.GetSwapUtilization()
 			mustUpdateText(
 				dev,
-				fmtKeyVal("MEM", memText),
-				fmtKeyVal("SWP", swapText),
+				fmtKeyVal("MEM", memText, columns),
+				fmtKeyVal("SWP", swapText, columns),
 			)
-
 			time.Sleep(interval)
 
 			cpuText, _ := stats.GetCpuUtilization()
 			loadText, _ := stats.GetLoad()
-			mustUpdateText(dev, fmtKeyVal("CPU", cpuText), loadText)
-
+			mustUpdateText(
+				dev,
+				fmtKeyVal("CPU", cpuText, columns),
+				loadText,
+			)
 			time.Sleep(interval)
 
 			totalTransmit, _ := stats.GetTotalTransmit()
 			totalReceive, _ := stats.GetTotalReceive()
 			mustUpdateText(
 				dev,
-				fmtKeyVal("TTX", totalTransmit),
-				fmtKeyVal("TRX", totalReceive),
+				fmtKeyVal("TTX", totalTransmit, columns),
+				fmtKeyVal("TRX", totalReceive, columns),
 			)
-
 			time.Sleep(interval)
 
 			connectionText, _ := stats.GetConnectionStatus("wlan0", "eth0")
 			localIPText, _ := stats.GetLocalIP("wlan0", "eth0")
-			mustUpdateText(dev, connectionText, localIPText)
-
+			mustUpdateText(
+				dev,
+				connectionText,
+				localIPText,
+			)
 			time.Sleep(interval)
 
 			for _, deviceName := range diskDeviceNames {
 				diskInfoText, _ := stats.GetDiskInfo(deviceName)
 				diskUtilizationText, _ := stats.GetDiskUtilization(deviceName)
 
-				mustUpdateText(dev, diskInfoText, diskUtilizationText)
-
+				mustUpdateText(
+					dev,
+					diskInfoText,
+					diskUtilizationText,
+				)
 				time.Sleep(interval)
 			}
 		}
